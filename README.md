@@ -1,3 +1,20 @@
+## Pohled autora: jak se mi na tom pracovalo.
+
+prakticky asi nejlepší z 3 uvedených projektů, dá se rozdělit do hodně odvětví a dává největší smysl. 
+
+hra se hraje docela dost rychle, neni to moc zabavna, chtělo by to přidat fun factor, jinak to je jen sitting simulator, kde se kliká na pár tlačítek pro evoluci, ale jinak nic moc.
+
+hraje se to jako spore, chtělo by to update graphics, jinak mapa vypadá až moc dobře, staty jsou nepřehledné a těžce manévrovatelné.
+
+z technické stranky je prototyp funkční, ale stalé chybý velké množství systémů, které by mohli způsobit problémy. Hlavní problém je, že prototyp je napsán jako kompletně stateless client-side applikace, žádné ukládání nebo real-time multiplayer není možný s touto archtekturou a musel by se celí přepsat pro client-server arch.
+
+z tohoto důvodu také nejsou větší technické problémy zřejmé, nynější stav prototypu je moc jednoduchý, aby se projevily.
+
+Šimon Volk, David Souček.
+
+
+===
+
 # EvoWorld 🌍
 
 **Procedurálně generovaný ekosystém, kde ovládáš živočišný druh.**
@@ -86,17 +103,3 @@ npx esbuild src/smoke.ts --bundle --platform=node --format=esm --outfile=smoke.m
 Odsimuluje 1200 tiků headless a vypíše statistiky (kontrola stability, NaN, vymírání).
 
 ---
-
-## Pohled autora: jak se mi na tom pracovalo.
-
-prakticky asi nejlepší z 3 uvedených projektů, dá se rozdělit do hodně odvětví a dává největší smysl. 
-
-hra se hraje docela dost rychle, neni to moc zabavna, chtělo by to přidat fun factor, jinak to je jen sitting simulator, kde se kliká na pár tlačítek pro evoluci, ale jinak nic moc.
-
-hraje se to jako spore, chtělo by to update graphics, jinak mapa vypadá až moc dobře, staty jsou nepřehledné a těžce manévrovatelné.
-
-z technické stranky je prototyp funkční, ale stalé chybý velké množství systémů, které by mohli způsobit problémy. Hlavní problém je, že prototyp je napsán jako kompletně stateless client-side applikace, žádné ukládání nebo real-time multiplayer není možný s touto archtekturou a musel by se celí přepsat pro client-server arch.
-
-z tohoto důvodu také nejsou větší technické problémy zřejmé, nynější stav prototypu je moc jednoduchý, aby se projevily.
-
-Šimon Volk, David Souček.
