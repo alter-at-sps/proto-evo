@@ -87,75 +87,16 @@ Odsimuluje 1200 tiků headless a vypíše statistiky (kontrola stability, NaN, v
 
 ---
 
-## Pohled autora: jak se mi na tom pracovalo a sedí 28 lidí?
+## Pohled autora: jak se mi na tom pracovalo.
 
-> Tahle sekce je upřímná poznámka ode mě (Claude) — jak vnímám projekt a jestli
-> dává smysl rozdělení práce z prezentace.
+prakticky asi nejlepší z 3 uvedených projektů, dá se rozdělit do hodně odvětví a dává největší smysl. 
 
-### Jak se cítím o tomhle projektu
+hra se hraje docela dost rychle, neni to moc zabavna, chtělo by to přidat fun factor, jinak to je jen sitting simulator, kde se kliká na pár tlačítek pro evoluci, ale jinak nic moc.
 
-Baví mě. EvoWorld je nápad, který je radost stavět: má **jasné téma**, okamžitě
-srozumitelný cíl („přizpůsob se, nebo vymři") a hlavně **emergentní chování** —
-napíšeš pár jednoduchých ekologických pravidel a ono z toho vznikne živý svět,
-kde se populace honí za teplem, predátoři kolabují s kořistí a v zimě se druhy
-stahují do tropů. To je ten typ projektu, který odměňuje, protože ho vidíš
-*ožít* na obrazovce, ne jen projít testy.
+hraje se to jako spore, chtělo by to update graphics, jinak mapa vypadá až moc dobře, staty jsou nepřehledné a těžce manévrovatelné.
 
-Co je ale potřeba říct na rovinu: **to, co je v tomhle repu, je hratelné jádro
-pro jednoho hráče** — řádově den soustředěné práce. Produkční cíl z prezentace
-(reálný multiplayer, Postgres+Redis, WebGL, perzistentní svět běžící 24/7) je
-**úplně jiná váhová kategorie** — měsíce práce a spousta nudné, ale nutné
-infrastruktury, kterou na slajdech nikdo nevidí.
+z technické stranky je prototyp funkční, ale stalé chybý velké množství systémů, které by mohli způsobit problémy. Hlavní problém je, že prototyp je napsán jako kompletně stateless client-side applikace, žádné ukládání nebo real-time multiplayer není možný s touto archtekturou a musel by se celí přepsat pro client-server arch.
 
-### Jde to prakticky udělat ve 28 lidech, aby každý měl práci?
+z tohoto důvodu také nejsou větší technické problémy zřejmé, nynější stav prototypu je moc jednoduchý, aby se projevily.
 
-**Krátká odpověď: ano, ale ne tím způsobem, jak to navrhuje slajd „Rozdělení
-týmu" (6 featur × ~5 lidí).** To rozdělení přeceňuje, jak jsou ty featury
-„nezávislé".
-
-**Proč naivní dělení nefunguje:** všech 6 featur čte a zapisuje **stejný sdílený
-stav** — mřížku světa, model genomu, simulační tik, render pipeline, schéma
-perzistence, síťový protokol. Když do toho 28 lidí sahá najednou bez pevně
-domluvených rozhraní, dopadne to dvěma způsoby: buď **merge peklo**, nebo lidi
-**čekají na sebe** a nudí se. Tvrdá pravda je, že **jádro simulace je jeden
-koncepční celek, který dobře uvládnou ~2–4 lidi** — nedá se na něj „posadit"
-28 lidí. (Brooksův zákon: přidávání lidí na sdílené jádro ho zpomaluje.)
-
-**Jak ale 28 lidí smysluplně zaměstnat:** musíš (1) **rozšířit záběr** z „6
-herních featur" na skutečný produkt a (2) **nejdřív domluvit rozhraní**, teprve
-pak paralelizovat. Pak to vychází zhruba takhle:
-
-| Tým (pod) | Lidí | Co dělá |
-|-----------|------|---------|
-| **Core engine & platforma** | 3 | simulační tik, datový model, sdílená rozhraní, výkon, determinismus — vlastní kontrakty, na které ostatní stavějí |
-| **Generace světa** | 3 | noise, biomy, řeky, klima + nástroj na prohlížení seedů |
-| **Editor druhu & art** | 3 | genom, UX editoru, vizuální pipeline tvorů |
-| **Ekologie & balanc** | 3 | pravidla predace/kompetice/parazitismu, ladění obtížnosti, designérské nástroje |
-| **Dynamický svět** | 2 | sezóny, počasí, katastrofy, klimatická změna, plánovač událostí |
-| **Evoluční strom & meta** | 3 | strom, Hall of Fame, žebříčky, replay |
-| **Rendering / WebGL** | 3 | přechod Canvas→WebGL, shadery, sezónní vizuály, výkon |
-| **Backend & realtime** | 4 | Node + WebSockets synchronizace, auth, schéma Postgresu, live stav v Redisu, DevOps/CI |
-| **Frontend shell & UX** | 2 | app shell, HUD, navigace, přístupnost, i18n |
-| **QA, nástroje, release** | 2 | testy, CI/CD, telemetrie, triáž chyb |
-| **Tech lead + produkt/design** | 2 | architektura, kontrakty, design doc, drží to pohromadě |
-| **Celkem** | **~30** | → 28 míst se reálně naplní |
-
-**Co je u toho potřeba pohlídat (rizika):**
-
-- **Sekvence, ne všechno najednou.** Sprint 0 = core tým postaví datový model
-  a rozhraní; teprve pak ostatní pody paralelizují. Jinak má někdo „hotovou
-  featuru", ale není ji kam zapojit.
-- **Koordinace roste kvadraticky.** 28 lidí = nutný design doc, jasné API
-  kontrakty a pravidelná integrační kadence, jinak se utopíš ve schůzkách.
-- **Některé týdny budou některé pody blokované.** Počítej s rotací/párováním,
-  ať nikdo nezahálí.
-- **Malé jádro, široký okraj.** Sdílený engine drží malý tým; 28 lidí
-  zaměstnáš na *okrajích* produktu (netcode, art, nástroje, QA, infra, design),
-  ne na jednom simulačním souboru.
-
-**Verdikt:** 28 lidí *může* mít smysluplnou práci — ale jen když se na to
-přestaneš dívat jako na „6 nezávislých featur" a začneš to brát jako **produkt
-s platformou uprostřed a pody okolo**. Jako čistý plán „6 × 5 lidí" je tým
-předimenzovaný a několik lidí by skončilo buď bez práce, nebo by si lezli do
-zelí. S tím správným rozdělením (malé vlastnické jádro + rozšířený záběr +
-kontrakty předem) to ale reálně udělatelné je.
+Šimon Volk, David Souček.
