@@ -13,7 +13,7 @@ z tohoto důvodu také nejsou větší technické problémy zřejmé, nynější
 Šimon Volk, David Souček.
 
 
-===
+---
 
 # EvoWorld 🌍
 
@@ -101,5 +101,3 @@ npx esbuild src/smoke.ts --bundle --platform=node --format=esm --outfile=smoke.m
 ```
 
 Odsimuluje 1200 tiků headless a vypíše statistiky (kontrola stability, NaN, vymírání).
-
----
