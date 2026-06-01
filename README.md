@@ -1,4 +1,4 @@
-## Pohled autora: jak se mi nám tom pracovalo.
+## Pohled autora: jak se nám na tom pracovalo.
 
 prakticky asi nejlepší z 3 uvedených projektů, dá se rozdělit do hodně odvětví a dává největší smysl. 
 
