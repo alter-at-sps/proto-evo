@@ -10,7 +10,7 @@ z technické stranky je prototyp funkční, ale stalé chybý velké množství 
 
 z tohoto důvodu také nejsou větší technické problémy zřejmé, nynější stav prototypu je moc jednoduchý, aby se projevily.
 
-Šimon Volk, David Souček.
+David Souček.
 
 
 ---
@@ -160,3 +160,5 @@ předimenzovaný a část lidí by zahálela nebo si lezla do zelí.
 záměrně rozšířit záběr na celý produkt, re-platformovat na client-server a držet
 jádro v rukou malého týmu. Prototyp je důkaz, že **nápad funguje**, ne důkaz, že
 **28členný plán je správně naškálovaný**.
+
+Šimon Volk.
