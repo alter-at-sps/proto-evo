@@ -1,56 +1,38 @@
-// Headless smoke test enginu — neslouží produkci, jen ověření simulace.
-import { Game } from "./engine/game";
+// Headless smoke test agentního ekosystému.
+import { EcoGame } from "./engine/ecoGame";
 import { defaultTraits } from "./engine/species";
+import type { Traits } from "./engine/types";
 
-const seed = process.argv[2] ?? "smoke-seed-42";
-const game = new Game(seed, defaultTraits(), "Testus");
+const seed = process.argv[2] ?? "eco-42";
+const game = new EcoGame(seed);
 
-let mutations = 0;
-let seasons = 0;
-let lastSeason = game.sim.season;
-let maxPlayerPop = 0;
-let nanSeen = false;
+const herb: Traits = { ...defaultTraits(), diet: "herbivore" };
+const carn: Traits = { size: 2, teeth: 4, limbs: 3, wings: 0, hide: 1, diet: "carnivore" };
 
-for (let i = 0; i < 1200; i++) {
-  if (game.pendingMutations) {
-    // auto-vyber náhodnou mutaci
-    const opt = game.pendingMutations[Math.floor(Math.random() * game.pendingMutations.length)];
-    game.chooseMutation(opt.id);
-    mutations++;
-    continue;
+game.introduce("Glemur", "#4caf7d", herb, 40);
+
+let nan = false;
+const samples: string[] = [];
+for (let i = 0; i < 4000; i++) {
+  game.tick(1);
+  if (i === 600) game.introduce("Skarn", "#e74c3c", carn, 20); // přidej dravce později
+  if (!Number.isFinite(game.eco.aliveCount())) nan = true;
+  if (i % 400 === 0) {
+    const c = game.eco.countBySpecies();
+    samples.push(`h${c[0] ?? 0}/d${c[1] ?? 0}`);
   }
-  if (game.gameOver) break;
-  game.tick();
-
-  if (game.sim.season !== lastSeason) {
-    seasons++;
-    lastSeason = game.sim.season;
-  }
-  const pop = game.sim.totalPopulation(game.player);
-  if (!Number.isFinite(pop)) nanSeen = true;
-  maxPlayerPop = Math.max(maxPlayerPop, pop);
 }
 
-const alive = game.aliveSpecies();
-console.log("=== EvoWorld smoke test ===");
-console.log("tiků odběhnuto:", game.sim.tick);
-console.log("rok / sezóna:", game.sim.year, game.sim.season);
-console.log("přechodů sezón:", seasons);
-console.log("mutací hráče:", mutations);
-console.log("vrchol populace hráče:", maxPlayerPop);
-console.log("hráč žije:", game.player.diedTick === null);
-console.log("živých druhů:", alive.length, "/", game.sim.species.length);
-console.log("uzlů ve stromě hráče:", game.playerTree().size());
-console.log("klima posun:", game.sim.climateShift.toFixed(3));
-console.log("NaN viděn:", nanSeen);
-console.log(
-  "druhy:",
-  game.sim.species
-    .map((s) => `${s.name}[${s.traits.diet}] pop=${game.sim.totalPopulation(s)}${s.diedTick ? "✝" : ""}`)
-    .join(", ")
-);
-if (nanSeen) {
-  console.error("CHYBA: simulace vyprodukovala NaN!");
+const counts = game.eco.countBySpecies();
+console.log("=== Ekosystém smoke ===");
+console.log("čas:", Math.floor(game.eco.time));
+console.log("živých tvorů:", game.eco.aliveCount());
+console.log("druhy:", game.eco.species.map((s) => `${s.name}=${counts[s.id]}`).join(", "));
+console.log("narození / úmrtí:", game.eco.births, "/", game.eco.deaths);
+console.log("vzorky populace (á 400 tiků):", samples.join(", "));
+console.log("NaN:", nan);
+if (nan) {
+  console.error("CHYBA: NaN v ekosystému");
   process.exit(1);
 }
 console.log("OK");

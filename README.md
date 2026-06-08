@@ -60,7 +60,9 @@ Produkční build: `npm run build` → `npm run preview`.
 3. **Mezi sezónami** vybíráš mutaci, kterou tvůj druh přijme — každé rozhodnutí
    vytvoří novou **větev** evolučního stromu.
 4. Soupeříš s **divokými druhy** o potravu a území (predace, kompetice, parazitismus,
-   symbióza).
+   symbióza). Když se tvá kolonie střetne s cizím druhem, vypukne **souboj druhů**
+   (tahová mini-hra) — vyber akci (útok / silný úder / obrana / ústup); vítěz obsadí
+   území a získá jedince, poražený o populaci přijde.
 5. Když tvůj druh vymře, zapíše se i se svým stromem do **Síně slávy** a žebříčku
    (nejdelší přežití, největší území, nejunikátnější druh).
 
@@ -103,3 +105,58 @@ npx esbuild src/smoke.ts --bundle --platform=node --format=esm --outfile=smoke.m
 Odsimuluje 1200 tiků headless a vypíše statistiky (kontrola stability, NaN, vymírání).
 
 ---
+
+### Co tu vlastně je
+
+Funkční **prototyp agentního ekosystému** (à la Rain World): procedurální svět,
+jednotliví tvorové, kteří se sami pohybují, shánějí potravu, loví, prchají,
+množí se a mutují, a z toho emergentně vznikají **predátor–kořist cykly**. Role
+hráče = „maker": navrhne druh a vypustí ho. Engine je oddělený, deterministický,
+běží v prohlížeči. Jako *prototyp* je to hotové a hratelné.
+
+Je ale poctivé říct, co to **není**: není to produkt. Chybí perzistence, ukládání,
+multiplayer, server, automatické testy (kromě jednoho smoke skriptu), obsah,
+ladění obtížnosti a hloubka. Balanc drží na ~deseti ručně vyladěných konstantách,
+ne na promyšleném modelu — je křehký. Výkonnostní strop je ~700 agentů
+(jednovláknově). Evoluce je mělká (jen drift atributů).
+
+### Co kritizuju na samotném postupu
+
+- **Nestabilní scope.** Jádro se během vývoje přepsalo dvakrát (god-game →
+  agentní ekosystém). To je super pro prototyp, ale v týmu 28 lidí je taková
+  zásadní změna směru uprostřed projektu drahá a je to procesní varování —
+  znamenala by zahozenou práci několika podů.
+- **Veškerá zajímavost je v jednom souboru.** Celá „hra" je v simulačním tiku
+  (`ecosystem.ts`). To je pravý opak prezentačního „6 nezávislých featur".
+  Komplexita se koncentruje do jednoho sdíleného jádra, ne do paralelních modulů.
+- **Balanc = magická čísla.** Funguje to, ale není to robustní; každá změna může
+  rozhodit celý ekosystém. Bez testů a nástrojů na ladění je to údržbová zátěž.
+
+### Jde to zrealizovat ve 28 lidech?
+
+**Krátká, kritická odpověď: tenhle směr 28 lidí spíš vyvrací, než potvrzuje.**
+
+Důvod je strukturální. To, co dělá hru hrou — živá simulační smyčka — je
+**malé a nedělitelné jádro**, které dobře uvládnou 2–4 lidé. Nedá se „posadit"
+28 lidí na ladění jedné ekologické smyčky; přidávání lidí ji jen zpomalí
+(Brooksův zákon) a způsobí kolize nad sdíleným stavem. Prototyp tohle názorně
+ukazuje: hodnotná část je koncentrovaná a kompaktní.
+
+28 lidí **smysluplně zaměstnat jde**, ale jen když přestaneš tenhle prototyp brát
+jako cíl a uděláš z něj **produkt s platformou uprostřed a pody okolo**:
+
+- malý tým (3–4) vlastní simulační jádro + datové kontrakty,
+- okolo něj pody na **client-server přepis** (Node + WebSockets, Postgres, Redis),
+  rendering/WebGL, generaci světa, editor & art tvorů, nástroje pro design a
+  ladění balancu, obsah/biomy, QA + CI/CD, infra a produktový/UX design.
+
+To je ale **mnohem větší projekt než tento prototyp** — měsíce práce, nutné
+kontrakty předem (sprint 0), sekvenování (jádro dřív než pody) a počítání
+s koordinační režií. A pořád platí: jako čistý plán „6 featur × ~5 lidí" je tým
+předimenzovaný a část lidí by zahálela nebo si lezla do zelí.
+
+**Verdikt:** koncept je zábavný a technicky zdravý a *dá se* dotáhnout do hry pro
+28 lidí — ale ne tímto prototypem a ne tímhle rozdělením. Vyžadovalo by to
+záměrně rozšířit záběr na celý produkt, re-platformovat na client-server a držet
+jádro v rukou malého týmu. Prototyp je důkaz, že **nápad funguje**, ne důkaz, že
+**28členný plán je správně naškálovaný**.

@@ -26,20 +26,48 @@ export function CreaturePreview({
   traits,
   color,
   size = 160,
+  animate = true,
 }: {
   traits: Traits;
   color: string;
   size?: number;
+  animate?: boolean;
 }) {
   const ref = useRef<HTMLCanvasElement>(null);
+  const traitsRef = useRef(traits);
+  const colorRef = useRef(color);
+  traitsRef.current = traits;
+  colorRef.current = color;
+
   useEffect(() => {
     const c = ref.current;
     if (!c) return;
+    const dpr = Math.min(2, window.devicePixelRatio || 1);
+    c.width = size * dpr;
+    c.height = size * dpr;
     const ctx = c.getContext("2d")!;
-    ctx.clearRect(0, 0, c.width, c.height);
-    drawCreature(ctx, traits, color, c.width / 2, c.height / 2 - 6, size * 0.9);
-  }, [traits, color, size]);
-  return <canvas ref={ref} width={size} height={size} />;
+    let raf = 0;
+    const start = performance.now();
+    const render = (now: number) => {
+      const t = animate ? (now - start) / 1000 : 0;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      ctx.clearRect(0, 0, size, size);
+      drawCreature(
+        ctx,
+        traitsRef.current,
+        colorRef.current,
+        size / 2,
+        size / 2 - size * 0.03,
+        size * 0.92,
+        t
+      );
+      if (animate) raf = requestAnimationFrame(render);
+    };
+    raf = requestAnimationFrame(render);
+    return () => cancelAnimationFrame(raf);
+  }, [size, animate]);
+
+  return <canvas ref={ref} style={{ width: size, height: size }} />;
 }
 
 function TraitDots({
